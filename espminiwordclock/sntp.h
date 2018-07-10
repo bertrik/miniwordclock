@@ -1,0 +1,3 @@
+#define NTP_PACKET_SIZE 48
+
+

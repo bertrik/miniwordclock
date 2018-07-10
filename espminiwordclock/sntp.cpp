@@ -1,3 +1,11 @@
+#include <stdint.h>
+
+#include <Arduino.h>
+#include <IPAddress.h>
+#include <WiFiUdp.h>
+
+#include "sntp.h"
+#include "print.h"
 
 int sntp_sync(int localPort, IPAddress& address, int timeout, uint32_t *secsSince2000)
 {

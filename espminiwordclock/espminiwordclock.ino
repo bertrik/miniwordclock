@@ -6,37 +6,19 @@
 
 #include "editline.h"
 #include "cmdproc.h"
+#include "print.h"
 
 #include "Arduino.h"
 
-static int serial_putc(char c, FILE *t)
-{
-    Serial.write(c);
-    return 0;
-}
-
-static int print(const char *fmt, ...)
-{
-    char buf[256];
-    va_list args;
-    va_start (args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    va_end (args);
-
-    // send it to serial
-    char *p = buf;
-    while (*p != 0) {
-        serial_putc(*p++, 0);
-    }
-}
+static char line[256];
 
 void setup(void)
 {
     WiFiManager wifiManager;
 
     // Set up serial output
-    Serial.begin(115200);
-    edit_init(&serial_putc);
+    PrintInit(115200);
+    EditInit(line, sizeof(line));
 
     // set up WIFI connection
     wifiManager.autoConnect("ESP_CLOCK");
@@ -61,11 +43,13 @@ static int do_help(int argc, char *argv[])
 
 void loop(void)
 {
-    static char line[64];
-    
+
     if (Serial.available()) {
-        char c = Serial.read();
-        if (edit_line(c, line, sizeof(line))) {
+        char cin = Serial.read();
+        char cout;
+        boolean haveLine = EditLine(cin, &cout);
+        print("%c", cout);
+        if (haveLine) {
             int res = cmd_process(cmds, line);
             print("< %d\n", res);
             print("> ");

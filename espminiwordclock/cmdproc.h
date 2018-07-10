@@ -1,7 +1,8 @@
 // maximum number of arguments (including command itself)
-#define CMD_MAX_ARGS 5
+#define CMD_MAX_ARGS 16
 
-// error codes
+// default result codes
+#define CMD_OK      0
 #define CMD_NO_CMD  -0x7F00
 #define CMD_UNKNOWN -0x7F01
 
@@ -15,9 +16,10 @@ typedef struct {
 } cmd_t;
 
 /**
- * parses the given line into arguments
- * matches it with a command in the command table and
- * executes the command
+ * Parses the given line into arguments, matches it with a command and executes the command.
+ * @param[in] commands command table
+ * @param[in] line the line to parse
+ * @return the result of command execution
  */
 int cmd_process(const cmd_t *commands, char *line);
 

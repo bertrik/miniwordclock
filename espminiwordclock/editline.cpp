@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include "editline.h"
 
 #define BELL    0x07
@@ -6,55 +5,54 @@
 #define LF      0x0A
 #define CR      0x0D
 
-static putc_fn_t *put;
+static char *line;
+static int size;
+static int pos = 0;
 
-void edit_init(putc_fn_t *putc_fn)
+/**
+ * Initializes the edit buffer.
+ *
+ * @param buffer the edit buffer
+ * @param bufsize the size of the edit buffer
+ */
+void EditInit(char *buffer, int bufsize)
 {
-    put = putc_fn;
+    line = buffer;
+    size = bufsize;
 }
 
-/* Processes a character into an edit buffer, returns true
- * @param c the character to process
- * @param buf the edit buffer
- * @param size the size of the buffer
+/** 
+ * Processes a character into an edit buffer, returns true
+ * if a full line has been received
+ * 
+ * @param cin the character to process
+ * @param cout the output character
  * @return true if a full line was entered, false otherwise
  */
-bool edit_line(char c, char *buf, int size)
+bool EditLine(char cin, char *cout)
 {
-    static int index = 0;
-
-    switch (c) {
-
-    case CR:
-    case LF:
-        // finish
-        buf[index] = 0;
-        put(c, 0);
-        index = 0;
+    *cout = cin;                // echo by default
+    switch (cin) {              // carriage return is ignored
+    case '\r':
+        break;
+    case '\n':                 // end-of-line
+        line[pos] = '\0';
+        pos = 0;
         return true;
-
-    case BS:
-    case 127:
-        // backspace
-        if (index > 0) {
-            put(BS, 0);
-            put(' ', 0);
-            put(BS, 0);
-            index--;
-        } else {
-            put(BELL, 0);
+    case 0x7F:
+    case 0x08:                 // backspace
+        if (pos > 0) {
+            pos--;
         }
         break;
-
     default:
-        // try to add character to buffer
-        if (index < (size - 1)) {
-            buf[index++] = c;
-            put(c, 0);
+        if (pos < (size - 1)) { // store char as long as there is space to do so
+            line[pos++] = cin;
         } else {
-            put(BELL, 0);
+            *cout = 0x07;       // bell
         }
         break;
     }
     return false;
 }
+
