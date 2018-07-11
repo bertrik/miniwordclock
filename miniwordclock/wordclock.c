@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 
-const char letters[8][8] = {
+const char letters[][9] = {
     "VIJFTIEN",
     "VOOROVER",
     "HALF*ZES",
