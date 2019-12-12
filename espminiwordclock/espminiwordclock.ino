@@ -17,13 +17,13 @@ void setup(void)
     WiFiManager wifiManager;
 
     // Set up serial output
-    PrintInit(115200);
+    Serial.begin(115200);
     EditInit(line, sizeof(line));
 
     // set up WIFI connection
     wifiManager.autoConnect("ESP_CLOCK");
     
-    print("Hello World!\n");
+    printf("Hello World!\n");
 }
 
 static int do_help(int argc, char *argv[]);
@@ -36,7 +36,7 @@ static const cmd_t cmds[] = {
 static int do_help(int argc, char *argv[])
 {
     for (const cmd_t *cmd = cmds; cmd->name[0] != 0; cmd++) {
-        print("%10s %s\n", cmd->name, cmd->help);
+        printf("%10s %s\n", cmd->name, cmd->help);
     }
     return 0;
 }
@@ -48,11 +48,11 @@ void loop(void)
         char cin = Serial.read();
         char cout;
         boolean haveLine = EditLine(cin, &cout);
-        print("%c", cout);
+        printf("%c", cout);
         if (haveLine) {
             int res = cmd_process(cmds, line);
-            print("< %d\n", res);
-            print("> ");
+            printf("< %d\n", res);
+            printf("> ");
         }
     }
 }

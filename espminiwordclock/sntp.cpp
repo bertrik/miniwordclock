@@ -4,8 +4,8 @@
 #include <IPAddress.h>
 #include <WiFiUdp.h>
 
-#include "sntp.h"
 #include "print.h"
+#include "sntp.h"
 
 int sntp_sync(int localPort, IPAddress& address, int timeout, uint32_t *secsSince2000)
 {
@@ -19,7 +19,7 @@ int sntp_sync(int localPort, IPAddress& address, int timeout, uint32_t *secsSinc
     // 8 bytes of zero for Root Delay & Root Dispersion
 
     // send it
-    print("sending NTP packet...\n");
+    printf("sending NTP packet...\n");
     WiFiUDP udp;
     udp.begin(localPort);
     udp.beginPacket(address, 123); //NTP requests are to port 123
@@ -27,17 +27,17 @@ int sntp_sync(int localPort, IPAddress& address, int timeout, uint32_t *secsSinc
     udp.endPacket();
     
     // wait for response
-    print("waiting for response...");
+    printf("waiting for response...");
     int cb;
     unsigned long start = millis();
     while ((cb = udp.parsePacket()) <= 0) {
         if ((millis() - start) > timeout) {
-            print("timeout!\n");
+            printf("timeout!\n");
             return -1;
         }
         delay(10);
     }
-    print("got %d bytes\n", cb);
+    printf("got %d bytes\n", cb);
 
     // decode response
     udp.read(buf, sizeof(buf));
